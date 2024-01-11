@@ -8,7 +8,7 @@ import { checkRole } from '../../../middlewares/checkRole';
 
 const router = Router();
 
-router.post('/create', async (req: Request, res: Response, next: NextFunction) => {
+router.post('/create', checkRole(Role.ADM), async (req: Request, res: Response, next: NextFunction) => {
     try {
         const user = await UserService.createUser(req.body);
             res.status(statusCodes.SUCCESS).json(user);
@@ -17,7 +17,7 @@ router.post('/create', async (req: Request, res: Response, next: NextFunction) =
     }
 });
 
-router.get('/allUsers', async (req: Request, res: Response, next: NextFunction) => {
+router.get('/get', checkRole(Role.ADM), async (req: Request, res: Response, next: NextFunction) => {
     try {
         const users = await UserService.getUsers();
         res.status(statusCodes.SUCCESS).json(users);
@@ -26,39 +26,40 @@ router.get('/allUsers', async (req: Request, res: Response, next: NextFunction) 
     }
 });
 
-router.get('userByEmail', async (req: Request, res: Response, next: NextFunction) => {
+router.get('get/email/:email', checkRole(Role.ADM), async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const user = await UserService.getUserbyemail(req.body.email);
+        const user = await UserService.getUserbyEmail(req.params.email);
         res.status(statusCodes.SUCCESS).json(user);
     } catch (error) {
         next(error);
     }
 });
 
-router.get('/userById', async (req: Request, res: Response, next: NextFunction) => {
+router.get('/get/id/:id', checkRole(Role.ADM), async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const user = await UserService.getUserbyId(req.body.idUser);
+
+        const user = await UserService.getUserbyId(Number(req.params.idUser));
         res.status(statusCodes.SUCCESS).json(user);
     } catch (error) {
         next(error);
     }
 });
 
-router.get('/userByPhoneNumber', async (req: Request, res: Response, next: NextFunction) => {
+router.get('/get/phone/:phone', checkRole(Role.ADM), async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const user = await UserService.getUserbyPhoneNumber(req.body.phoneNumber);
+        const user = await UserService.getUserbyPhoneNumber(req.params.phoneNumber);
         res.status(statusCodes.SUCCESS).json(user);
     } catch (error) {
         next(error);
     }
 });
 
-router.put('/updateUser', async (req: Request, res: Response, next: NextFunction) => {
+router.put('/update/:id', checkRole(Role.ADM), async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { idUser, name, email, photo, password, role, phoneNumber, birth } = req.body;
 
         if (idUser === undefined) {
-            res.status(statusCodes.BAD_REQUEST).json({ error: "User not found" });
+            res.status(statusCodes.BAD_REQUEST).json({ error: 'User not found' });
             return;
         }
 
@@ -79,29 +80,29 @@ router.put('/updateUser', async (req: Request, res: Response, next: NextFunction
     }
 });
 
-router.delete('deleteUserByEmail', async (req: Request, res: Response, next: NextFunction) => {
+router.delete('delete/email/:email', checkRole(Role.ADM), async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const user = await UserService.deleteUserbyEmail(req.body.email);
-        res.status(statusCodes.SUCCESS).json(user);
+        const user = await UserService.deleteUserbyEmail(req.params.email);
+        res.status(statusCodes.SUCCESS).json('Usuário deletado com sucesso!');
     } catch (error) {
         next(error);
     }
 });
 
-router.delete('deleteUserById', async (req: Request, res: Response, next: NextFunction) => {
+router.delete('delete/id/:id', checkRole(Role.ADM), async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const user = await UserService.deleteUserbyId(req.body.idUser);
-        res.status(statusCodes.SUCCESS).json(user);
+        const user = await UserService.deleteUserbyId(Number(req.params.idUser));
+        res.status(statusCodes.SUCCESS).json('Usuário deletado com sucesso!');
     } catch (error) {
         next(error);
     }
 });
 
-router.put('/approve/:id', checkRole(Role.ADM), async (req: Request, res: Response, next: NextFunction) => {
+router.put('/approve/:id', checkRole(Role.ADM), checkRole(Role.ADM), async (req: Request, res: Response, next: NextFunction) => {
     try {
         await UserService.approveUser(Number(req.params.id));
         
-        res.status(statusCodes.SUCCESS).json("Usuário aprovado com sucesso!");
+        res.status(statusCodes.SUCCESS).json('Usuário aprovado com sucesso!');
     } catch (error) {
         next(error);
     }
