@@ -36,7 +36,7 @@ router.get('userByEmail', async (req: Request, res: Response, next: NextFunction
 
 router.get('/userById', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const user = await UserService.getUserbyId(req.body.id);
+        const user = await UserService.getUserbyId(req.body.idUser);
         res.status(statusCodes.SUCCESS).json(user);
     } catch (error) {
         next(error);
@@ -54,17 +54,17 @@ router.get('/userByPhoneNumber', async (req: Request, res: Response, next: NextF
 
 router.put('/updateUser', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { id, name, email, photo, password, role, phoneNumber, birth } = req.body;
+        const { idUser, name, email, photo, password, role, phoneNumber, birth } = req.body;
 
-        if (id === undefined) {
+        if (idUser === undefined) {
             res.status(statusCodes.BAD_REQUEST).json({ error: "User not found" });
             return;
         }
 
-        await UserService.updateUser({ name, email, photo, password, role, phoneNumber, birth }, id);
+        await UserService.updateUser(idUser, {idUser, name, email, photo, password, role, phoneNumber, birth });
 
         res.status(statusCodes.SUCCESS).json({
-            id,
+            idUser,
             name,
             email,
             photo,
@@ -89,7 +89,7 @@ router.delete('deleteUserByEmail', async (req: Request, res: Response, next: Nex
 
 router.delete('deleteUserById', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const user = await UserService.deleteUserbyId(req.body.id);
+        const user = await UserService.deleteUserbyId(req.body.idUser);
         res.status(statusCodes.SUCCESS).json(user);
     } catch (error) {
         next(error);
