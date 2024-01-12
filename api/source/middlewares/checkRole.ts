@@ -1,15 +1,16 @@
 import { Request, Response, NextFunction } from 'express';
 import statusCodes from '../../utils/statusCodes';
 import { NotAuthorizedError } from '../../errors/NotAuthorizedError';
+import Role from '../../utils/Role';
 
-function checkRole(req: Request, res: Response, next: NextFunction, role: string) {
+export function checkRole(role: string) {
+    return (req: Request, res: Response, next: NextFunction) => {
+        const roleUser = Role.ADM;
+        if (roleUser === role) {
+            next();
+        }
 
-	const roleUser = req.user.role;
-	if (roleUser === role) {
-		next();
-	}
-	res.status(statusCodes.UNAUTHORIZED).send({ msg: 'Não autorizado' });
-	throw new NotAuthorizedError('Usuário sem permissão');
+        res.status(statusCodes.UNAUTHORIZED).send({ msg: 'Não autorizado' });
+        throw new NotAuthorizedError('Usuário sem permissão');
+    };
 }
-
-export default checkRole;

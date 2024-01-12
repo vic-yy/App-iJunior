@@ -3,6 +3,7 @@ import UserService from '../services/UserService';
 import { Router, Request, Response, NextFunction } from 'express';
 import { Role } from '../../../../utils/Role'
 import { statusCodes } from  '../../../../utils/statusCodes'
+import { checkRole } from '../../../middlewares/checkRole';
 
 
 const router = Router();
@@ -96,6 +97,15 @@ router.delete('deleteUserById', async (req: Request, res: Response, next: NextFu
     }
 });
 
+router.put('/approve/:id', checkRole(Role.ADM), async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        await UserService.approveUser(Number(req.params.id));
+        
+        res.status(statusCodes.SUCCESS).json("Usuário aprovado com sucesso!");
+    } catch (error) {
+        next(error);
+    }
+});
 
 export default router;
 

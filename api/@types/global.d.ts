@@ -12,7 +12,5 @@ namespace NodeJS {
     interface ProcessEnv {
         APP_URL: string,
         PORT: number,
-        SECRET_KEY: string,
-        JWT_EXPIRATION: string,
     }
 }
