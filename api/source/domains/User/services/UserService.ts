@@ -1,5 +1,6 @@
-import { prismaClient } from "../../../../database/prismaClient";
+import { prisma } from "../../../../database/prismaClient";
 import { User } from '@prisma/client';
+import bcrypt from 'bcrypt';
 import Role from "../../../../utils/Role";
 
 import { InvalidParamError } from "../../../../errors/InvalidParamError";
@@ -8,19 +9,24 @@ import { QueryError } from "../../../../errors/QueryError";
 import isEmailValid from "../../../../utils/isEmailValid";
 import isURLValid from "../../../../utils/isURLValid";
 
-const prisma = prismaClient.PrismaClient;
 
 class UserService {
+
+	async encryptPassword(password:string) {
+		const salt = await bcrypt.genSalt(10);
+		const hash = await bcrypt.hash(password, salt);
+		return hash;
+	}
 
 	async createUser(body: User) {
 		const userSameEmail = await prisma.user.findFirst({ where: { email: body.email } });
 		const userSameNumber = await prisma.user.findFirst({ where: { phoneNumber: body.phoneNumber } });
 
 		if (userSameEmail) {
-			throw new QueryError("Error: e-mail already in use.");
+			throw new QueryError('Error: e-mail already in use.');
 		}
 		if (userSameNumber) {
-			throw new QueryError("Error: phone number already in use.");
+			throw new QueryError('Error: phone number already in use.');
 		}
 
 		if (body.name == null || body.name.trim() == '') {
@@ -29,7 +35,7 @@ class UserService {
 		if (body.password == null || body.password.trim() == '') {
 			throw new QueryError('Error: you did not define a password.');
 		}
-		if (body.birth == null || body.birth.trim() == '') {
+		if (body.birth == null) {
 			throw new QueryError('Error: you did not define a birth date.');
 		}
 
@@ -39,16 +45,17 @@ class UserService {
 		if (body.photo != null && !isURLValid(body.photo)) {
 			throw new InvalidParamError('Error: invalid photo.');
 		}
-		if (body.role != Role.USER && body.role != null) {
-			throw new InvalidParamError('Error: invalid role. It must be user.');
+		if (body.role != Role.ADM && body.role != Role.MEMBRO && body.role != Role.TRAINEE) {
+			throw new InvalidParamError('Error: invalid role. It must be "administrador", "membro" or "trainee".');
 		}
 
+		const encrypted = await this.encryptPassword(body.password);
 		const user = {
 			name: body.name,
 			email: body.email,
 			photo: body.photo,
 			password: body.password,
-			role: Role.USER,
+			role: body.role,
 			phoneNumber: body.phoneNumber,
 			birth: body.birth
 		}
@@ -77,7 +84,7 @@ class UserService {
 		if (user) {
 			return user;
 		} else {
-			throw new QueryError("Error: this e-mail is not associated with any account.");
+			throw new QueryError('Error: this e-mail is not associated with any account.');
 		}
 
 	}
@@ -85,17 +92,17 @@ class UserService {
 	async getUserbyId(wantedId: number) {
 		const user = await prisma.user.findFirst({
 			where: {
-				id: wantedId
+				idUser: wantedId
 			},
 		});
 		if (user) {
 			return user;
 		} else {
-			throw new QueryError("Error: this id does not exist.");
+			throw new QueryError('Error: this id does not exist.');
 		}
 	}
 
-	async getUserbyPhoneNumber(wantedNumber: number) {
+	async getUserbyPhoneNumber(wantedNumber: string) {
 		const user = await prisma.user.findFirst({
 			where: {
 				phoneNumber: wantedNumber
@@ -104,7 +111,7 @@ class UserService {
 		if (user) {
 			return user;
 		} else {
-			throw new QueryError("Error: this phone number is not associated with any account.");
+			throw new QueryError('Error: this phone number is not associated with any account.');
 		}
 	}
 
@@ -116,10 +123,10 @@ class UserService {
 		const userSameNumber = await prisma.user.findFirst({ where: { phoneNumber: body.phoneNumber } });
 
 		if (userSameEmail) {
-			throw new QueryError("Error: e-mail already in use.");
+			throw new QueryError('Error: e-mail already in use.');
 		}
 		if (userSameNumber) {
-			throw new QueryError("Error: phone number already in use.");
+			throw new QueryError('Error: phone number already in use.');
 		}
 
 		if (body.email && !isEmailValid(body.email)) {
@@ -128,8 +135,8 @@ class UserService {
 		if (body.photo && !isURLValid(body.photo)) {
 			throw new InvalidParamError('Error: invalid photo.');
 		}
-		if (body.role && body.role != Role.USER) {
-			throw new InvalidParamError('Error: invalid role. It must be user.');
+		if (body.role && body.role != Role.ADM && body.role != Role.MEMBRO && body.role != Role.TRAINEE) {
+			throw new InvalidParamError('Error: invalid role. It must be "administrador", "membro" or "trainee".');
 		}
 
 		await prisma.user.update({
@@ -138,12 +145,12 @@ class UserService {
 				email: body.email,
 				photo: body.photo,
 				password: body.password,
-				role: Role.USER,
+				role: body.role,
 				phoneNumber: body.phoneNumber,
 				birth: body.birth
 			},
 			where: {
-				id: id
+				idUser: id
 			}
 		});
 	}
@@ -151,14 +158,14 @@ class UserService {
 	async deleteUserbyEmail(wantedEmail: string) {
 		const user = await this.getUserbyemail(wantedEmail);
 		if (user) {
-			await prisma.user.delete(user);
+			await prisma.user.delete(({ where: { email: wantedEmail } }));
 		}
 	}
 
 	async deleteUserbyId(wantedId: number) {
 		const user = await this.getUserbyId(wantedId);
 		if (user) {
-			await prisma.user.delete(user);
+			await prisma.user.delete(({ where: { idUser: wantedId } }));
 		}
 	}
 
@@ -175,10 +182,10 @@ class UserService {
 					},
 				});
 			} else {
-				throw new QueryError("Error: this user is already approved.");
+				throw new QueryError('Error: this user is already approved.');
 			}
 		} else {
-			throw new QueryError("Error: this id does not exist.");
+			throw new QueryError('Error: this id does not exist.');
 		}
 	}
 
