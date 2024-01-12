@@ -92,7 +92,7 @@ class UserService {
 	async getUserbyId(wantedId: number) {
 		const user = await prisma.user.findFirst({
 			where: {
-				idUser: wantedId
+				id: wantedId
 			},
 		});
 		if (user) {
@@ -150,7 +150,7 @@ class UserService {
 				birth: body.birth
 			},
 			where: {
-				idUser: id
+				id: id
 			}
 		});
 	}
@@ -165,7 +165,7 @@ class UserService {
 	async deleteUserbyId(wantedId: number) {
 		const user = await this.getUserbyId(wantedId);
 		if (user) {
-			await prisma.user.delete(({ where: { idUser: wantedId } }));
+			await prisma.user.delete(({ where: { id: wantedId } }));
 		}
 	}
 
