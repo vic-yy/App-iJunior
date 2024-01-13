@@ -1,14 +1,14 @@
 import { prisma } from "../../../../database/prismaClient";
 import { User } from '@prisma/client';
 import bcrypt from 'bcrypt';
-import Role from "../../../../utils/Role";
+
+import { transformRole } from "../../../../utils/tranformRole";
 
 import { InvalidParamError } from "../../../../errors/InvalidParamError";
 import { QueryError } from "../../../../errors/QueryError";
 
 import isEmailValid from "../../../../utils/isEmailValid";
 import isURLValid from "../../../../utils/isURLValid";
-
 
 class UserService {
 
@@ -45,7 +45,7 @@ class UserService {
 		if (body.photo != null && !isURLValid(body.photo)) {
 			throw new InvalidParamError('Error: invalid photo.');
 		}
-		if (body.role != Role.ADM && body.role != Role.MEMBRO && body.role != Role.TRAINEE) {
+		if (transformRole(body.role)=='none') {
 			throw new InvalidParamError('Error: invalid role. It must be "administrador", "membro" or "trainee".');
 		}
 
@@ -54,10 +54,11 @@ class UserService {
 			name: body.name,
 			email: body.email,
 			photo: body.photo,
-			password: body.password,
-			role: body.role,
+			password: encrypted,
+			role: transformRole(body.role),
 			phoneNumber: body.phoneNumber,
-			birth: body.birth
+			birth: body.birth,
+			approved: false
 		}
 		await prisma.user.create({
 			data: user
@@ -135,8 +136,15 @@ class UserService {
 		if (body.photo && !isURLValid(body.photo)) {
 			throw new InvalidParamError('Error: invalid photo.');
 		}
-		if (body.role && body.role != Role.ADM && body.role != Role.MEMBRO && body.role != Role.TRAINEE) {
+		if (body.role && transformRole(body.role)=='none') {
 			throw new InvalidParamError('Error: invalid role. It must be "administrador", "membro" or "trainee".');
+		}
+
+		let encrypted;
+		if (body.password) {
+			encrypted = await this.encryptPassword(body.password);
+		} else {
+			encrypted = user.password;
 		}
 
 		await prisma.user.update({
@@ -144,8 +152,8 @@ class UserService {
 				name: body.name,
 				email: body.email,
 				photo: body.photo,
-				password: body.password,
-				role: body.role,
+				password: encrypted,
+				role: transformRole(body.role),
 				phoneNumber: body.phoneNumber,
 				birth: body.birth
 			},
