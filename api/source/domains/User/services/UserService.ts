@@ -2,11 +2,10 @@ import { prisma } from "../../../../database/prismaClient";
 import { User } from '@prisma/client';
 import bcrypt from 'bcrypt';
 
-import { transformRole } from "../../../../utils/tranformRole";
-
 import { InvalidParamError } from "../../../../errors/InvalidParamError";
 import { QueryError } from "../../../../errors/QueryError";
 
+import { transformRole } from "../../../../utils/Role";
 import isEmailValid from "../../../../utils/isEmailValid";
 import isURLValid from "../../../../utils/isURLValid";
 
@@ -138,6 +137,9 @@ class UserService {
 		}
 		if (body.role && transformRole(body.role)=='none') {
 			throw new InvalidParamError('Error: invalid role. It must be "administrador", "membro" or "trainee".');
+		}
+		if (body.id) {
+			throw new InvalidParamError('Error: you can not update an id.');
 		}
 
 		let encrypted;
