@@ -58,9 +58,7 @@ class UserService {
 			phoneNumber: body.phoneNumber,
 			birth: body.birth
 		}
-		await prisma.user.create({
-			data: user
-		});
+		await prisma.user.create({ data: user });
 		return (user);
 	}
 
@@ -118,13 +116,14 @@ class UserService {
 		if (body.photo && !isURLValid(body.photo)) {
 			throw new InvalidParamError('Error: invalid photo.');
 		}
-		if (body.role && transformRole(body.role)=='none') {
-			throw new InvalidParamError('Error: invalid role. It must be "administrator", "member" or "trainee".');
-		}
 
-		if (body.id && body.id != user.id) {
+		if (body.role && (transformRole(body.role) != user.role)) {
+			throw new InvalidParamError('Error: only administrators can update a role.');
+		}
+		if (body.id && (body.id != user.id)) {
 			throw new InvalidParamError('Error: you can not update an id.');
 		}
+
 
 		let encrypted;
 		if (body.password) {
@@ -147,6 +146,17 @@ class UserService {
 				id: id
 			}
 		});
+	}
+
+	async updateRole (id:number, role: string) {
+		const user = await this.getUserbyId(id);
+		const formattedRole = transformRole(role);
+
+		if (formattedRole=='none') {
+			throw new InvalidParamError('Error: invalid role. It must be "administrator", "member" or "trainee".');
+		} else {
+			user.role = formattedRole;
+		}
 	}
 
 	async deleteUserbyEmail(wantedEmail: string) {
