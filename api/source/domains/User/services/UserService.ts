@@ -163,27 +163,6 @@ class UserService {
 			await prisma.user.delete(({ where: { id: wantedId } }));
 		}
 	}
-
-	async approveUser(id: number) {
-		const user = await this.getUserbyId(id);
-		if (user) {
-			if (user.approved == false) {
-				await prisma.user.update({
-					where: {
-						id: id,
-					},
-					data: {
-						approved: true,
-					},
-				});
-			} else {
-				throw new QueryError('Error: this user is already approved.');
-			}
-		} else {
-			throw new QueryError('Error: this id does not exist.');
-		}
-	}
-
 }
 
 export default new UserService;

@@ -56,17 +56,17 @@ router.get('/get/phone/:phone', checkRole(Role.ADM), async (req: Request, res: R
 
 router.put('/update/:id', checkRole(Role.ADM), async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { idUser, name, email, photo, password, role, phoneNumber, birth } = req.body;
+        const { id, name, email, photo, password, role, phoneNumber, birth, approved } = req.body;
 
-        if (idUser === undefined) {
+        if (id === undefined) {
             res.status(statusCodes.BAD_REQUEST).json({ error: 'User not found' });
             return;
         }
 
-        await UserService.updateUser(idUser, {idUser, name, email, photo, password, role, phoneNumber, birth });
+        await UserService.updateUser(id, { id, name, email, photo, password, role, phoneNumber, birth, approved });
 
         res.status(statusCodes.SUCCESS).json({
-            idUser,
+            id,
             name,
             email,
             photo,
@@ -93,16 +93,6 @@ router.delete('delete/id/:id', checkRole(Role.ADM), async (req: Request, res: Re
     try {
         const user = await UserService.deleteUserbyId(Number(req.params.idUser));
         res.status(statusCodes.SUCCESS).json('Usuário deletado com sucesso!');
-    } catch (error) {
-        next(error);
-    }
-});
-
-router.put('/approve/:id', checkRole(Role.ADM), checkRole(Role.ADM), async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        await UserService.approveUser(Number(req.params.id));
-        
-        res.status(statusCodes.SUCCESS).json('Usuário aprovado com sucesso!');
     } catch (error) {
         next(error);
     }
