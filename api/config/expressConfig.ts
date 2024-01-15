@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import express, { Express } from "express";
 import cors, { CorsOptions } from "cors";
+import UserRouter from "../source/domains/User/controllers/index";
 
 dotenv.config();
 
@@ -16,5 +17,6 @@ app.use(express.json());
 app.use(express.urlencoded({
     extended: true
 }));
+app.use("/api/users", UserRouter)
 
 export default app;

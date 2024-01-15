@@ -7,13 +7,11 @@ export function checkRole(roles: string[]) {
     return (req: Request, res: Response, next: NextFunction) => {
         const roleUser = Role.ADM;
 
-        for(const role in roles){
-            if (roleUser === role) {
-                next();
-            }
+        if (roles.includes(roleUser)) {
+            next();
+        } else {
+            res.status(statusCodes.UNAUTHORIZED).send({ msg: 'Não autorizado' });
+            throw new NotAuthorizedError('Usuário sem permissão');
         }
-
-        res.status(statusCodes.UNAUTHORIZED).send({ msg: 'Não autorizado' });
-        throw new NotAuthorizedError('Usuário sem permissão');
     };
 }
