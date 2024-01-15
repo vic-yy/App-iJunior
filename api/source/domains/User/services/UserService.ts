@@ -56,8 +56,7 @@ class UserService {
 			password: encrypted,
 			role: transformRole(body.role),
 			phoneNumber: body.phoneNumber,
-			birth: body.birth,
-			approved: false
+			birth: body.birth
 		}
 		await prisma.user.create({
 			data: user

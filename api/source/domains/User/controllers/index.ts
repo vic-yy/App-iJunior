@@ -56,25 +56,15 @@ router.get('/get/phone/:phone', checkRole([Role.ADM, Role.MEMBRO]), async (req: 
 
 router.put('/update/:id', checkRole([Role.ADM, Role.MEMBRO, Role.TRAINEE]), async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { id, name, email, photo, password, role, phoneNumber, birth, approved } = req.body;
-
+        const id = Number(req.params.id);
         if (id === undefined) {
             res.status(statusCodes.BAD_REQUEST).json({ error: 'User not found' });
             return;
         }
 
-        await UserService.updateUser(id, { id, name, email, photo, password, role, phoneNumber, birth });
+        await UserService.updateUser(id, req.body);
 
-        res.status(statusCodes.SUCCESS).json({
-            id,
-            name,
-            email,
-            photo,
-            password,
-            role,
-            phoneNumber,
-            birth,
-        });
+        res.status(statusCodes.SUCCESS).json("Usuário editado com sucesso!");
     } catch (error) {
         next(error);
     }
