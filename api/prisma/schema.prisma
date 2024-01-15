@@ -15,5 +15,5 @@ model User {
   password    String
   role        String
   phoneNumber String
-  birth       DateTime
+  birth       String
 }
