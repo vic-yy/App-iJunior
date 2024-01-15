@@ -38,7 +38,7 @@ router.get('/get/email/:email', checkRole([Role.ADM, Role.MEMBRO]), async (req: 
 router.get('/get/id/:id', checkRole([Role.ADM, Role.MEMBRO]), async (req: Request, res: Response, next: NextFunction) => {
     try {
 
-        const user = await UserService.getUserbyId(Number(req.params.idUser));
+        const user = await UserService.getUserbyId(Number(req.params.id));
         res.status(statusCodes.SUCCESS).json(user);
     } catch (error) {
         next(error);
@@ -91,7 +91,7 @@ router.delete('/delete/email/:email', checkRole([Role.ADM]), async (req: Request
 
 router.delete('/delete/id/:id', checkRole([Role.ADM]), async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const user = await UserService.deleteUserbyId(Number(req.params.idUser));
+        const user = await UserService.deleteUserbyId(Number(req.params.id));
         res.status(statusCodes.SUCCESS).json('Usuário deletado com sucesso!');
     } catch (error) {
         next(error);
