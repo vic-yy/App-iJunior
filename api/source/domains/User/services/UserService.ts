@@ -11,7 +11,7 @@ import isURLValid from "../../../../utils/isURLValid";
 
 class UserService {
 
-	async encryptPassword(password:string) {
+	async encryptPassword(password: string) {
 		const salt = await bcrypt.genSalt(10);
 		const hash = await bcrypt.hash(password, salt);
 		return hash;
@@ -44,7 +44,7 @@ class UserService {
 		if (body.photo != null && !isURLValid(body.photo)) {
 			throw new InvalidParamError('Error: invalid photo.');
 		}
-		if (transformRole(body.role)=='none') {
+		if (transformRole(body.role) == 'none') {
 			throw new InvalidParamError('Error: invalid role. It must be "administrator", "member" or "trainee".');
 		}
 
@@ -72,7 +72,7 @@ class UserService {
 	}
 
 	async getUserbyEmail(wantedEmail: string) {
-		const user = await prisma.user.findFirst({ where: { email: wantedEmail }});
+		const user = await prisma.user.findFirst({ where: { email: wantedEmail } });
 		if (user) {
 			return user;
 		} else {
@@ -81,7 +81,7 @@ class UserService {
 	}
 
 	async getUserbyId(wantedId: number) {
-		const user = await prisma.user.findFirst({ where: { id: wantedId }});
+		const user = await prisma.user.findFirst({ where: { id: wantedId } });
 		if (user) {
 			return user;
 		} else {
@@ -90,7 +90,7 @@ class UserService {
 	}
 
 	async getUserbyPhoneNumber(wantedNumber: string) {
-		const user = await prisma.user.findFirst({ where: { phoneNumber: wantedNumber }});
+		const user = await prisma.user.findFirst({ where: { phoneNumber: wantedNumber } });
 		if (user) {
 			return user;
 		} else {
@@ -148,14 +148,26 @@ class UserService {
 		});
 	}
 
-	async updateRole (id:number, role: string) {
+	async updateRole(id: number, role: string) {
 		const user = await this.getUserbyId(id);
+
+		if (!user) {
+			throw new InvalidParamError(`User not found.`);
+		}
+
 		const formattedRole = transformRole(role);
 
-		if (formattedRole=='none') {
+		if (formattedRole == 'none') {
 			throw new InvalidParamError('Error: invalid role. It must be "administrator", "member" or "trainee".');
 		} else {
-			user.role = formattedRole;
+			await prisma.user.update({
+				where: {
+					id: id,
+				},
+				data: {
+					role: formattedRole,
+				},
+			});
 		}
 	}
 

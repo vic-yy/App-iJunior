@@ -70,6 +70,22 @@ router.put('/update/:id', checkRole([Role.ADM, Role.MEMBRO, Role.TRAINEE]), asyn
     }
 });
 
+router.put('/update/role/:id', checkRole([Role.ADM]), async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const id = Number(req.params.id);
+        if (id === undefined) {
+            res.status(statusCodes.BAD_REQUEST).json({ error: 'User not found' });
+            return;
+        }
+
+        await UserService.updateRole(id, req.body.role);
+
+        res.status(statusCodes.SUCCESS).json("Cargo do usuário editado com sucesso!");
+    } catch (error) {
+        next(error);
+    }
+});
+
 router.delete('/delete/email/:email', checkRole([Role.ADM]), async (req: Request, res: Response, next: NextFunction) => {
     try {
         const user = await UserService.deleteUserbyEmail(req.params.email);
