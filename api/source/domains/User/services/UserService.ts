@@ -1,6 +1,7 @@
 import { prisma } from "../../../../database/prismaClient";
 import { User } from '@prisma/client';
 import bcrypt from 'bcrypt';
+import { v4 as uuidv4 } from 'uuid';
 
 import { InvalidParamError } from "../../../../errors/InvalidParamError";
 import { QueryError } from "../../../../errors/QueryError";
@@ -50,6 +51,7 @@ class UserService {
 
 		const encrypted = await this.encryptPassword(body.password);
 		const user = {
+			id: uuidv4(),
 			name: body.name,
 			email: body.email,
 			photo: body.photo,
@@ -80,7 +82,7 @@ class UserService {
 		}
 	}
 
-	async getUserbyId(wantedId: number) {
+	async getUserbyId(wantedId: string) {
 		const user = await prisma.user.findFirst({ where: { id: wantedId } });
 		if (user) {
 			return user;
@@ -98,7 +100,7 @@ class UserService {
 		}
 	}
 
-	async updateUser(id: number, body: User) {
+	async updateUser(id: string, body: User) {
 		const user = await this.getUserbyId(id);
 		const userSameEmail = await prisma.user.findFirst({ where: { email: body.email } });
 		const userSameNumber = await prisma.user.findFirst({ where: { phoneNumber: body.phoneNumber } });
@@ -148,7 +150,7 @@ class UserService {
 		});
 	}
 
-	async updateRole(id: number, role: string) {
+	async updateRole(id: string, role: string) {
 		const user = await this.getUserbyId(id);
 
 		if (!user) {
@@ -178,7 +180,7 @@ class UserService {
 		}
 	}
 
-	async deleteUserbyId(wantedId: number) {
+	async deleteUserbyId(wantedId: string) {
 		const user = await this.getUserbyId(wantedId);
 		if (user) {
 			await prisma.user.delete(({ where: { id: wantedId } }));

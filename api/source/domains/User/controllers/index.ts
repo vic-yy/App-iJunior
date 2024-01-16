@@ -38,7 +38,7 @@ router.get('/get/email/:email', checkRole([Role.ADM, Role.MEMBRO]), async (req: 
 router.get('/get/id/:id', checkRole([Role.ADM, Role.MEMBRO]), async (req: Request, res: Response, next: NextFunction) => {
     try {
 
-        const user = await UserService.getUserbyId(Number(req.params.id));
+        const user = await UserService.getUserbyId(req.params.id);
         res.status(statusCodes.SUCCESS).json(user);
     } catch (error) {
         next(error);
@@ -56,7 +56,7 @@ router.get('/get/phone/:phone', checkRole([Role.ADM, Role.MEMBRO]), async (req: 
 
 router.put('/update/:id', checkRole([Role.ADM, Role.MEMBRO, Role.TRAINEE]), async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const id = Number(req.params.id);
+        const id = req.params.id;
         if (id === undefined) {
             res.status(statusCodes.BAD_REQUEST).json({ error: 'User not found' });
             return;
@@ -72,7 +72,7 @@ router.put('/update/:id', checkRole([Role.ADM, Role.MEMBRO, Role.TRAINEE]), asyn
 
 router.put('/update/role/:id', checkRole([Role.ADM]), async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const id = Number(req.params.id);
+        const id = req.params.id;
         if (id === undefined) {
             res.status(statusCodes.BAD_REQUEST).json({ error: 'User not found' });
             return;
@@ -97,7 +97,7 @@ router.delete('/delete/email/:email', checkRole([Role.ADM]), async (req: Request
 
 router.delete('/delete/id/:id', checkRole([Role.ADM]), async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const user = await UserService.deleteUserbyId(Number(req.params.id));
+        const user = await UserService.deleteUserbyId(req.params.id);
         res.status(statusCodes.SUCCESS).json('Usuário deletado com sucesso!');
     } catch (error) {
         next(error);
