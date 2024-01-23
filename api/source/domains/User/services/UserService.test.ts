@@ -1,6 +1,8 @@
 import UserService from "./UserService";
+import { User } from '@prisma/client';
 import { prismaMock } from '../../../../config/singleton';
 import { QueryError } from "../../../../errors/QueryError";
+import e from "express";
 
 describe('createUser', () => {
     beforeEach(() => {
@@ -81,6 +83,127 @@ describe('deleteById', () => {
         expect(prismaMock.user.delete).not.toHaveBeenCalled();
     });
 });
+
+
+describe('getUserByEmail', () => {
+    
+        beforeEach(() => {
+            jest.resetAllMocks();
+            jest.clearAllMocks();
+        });
+    
+        test('o email é válido ==> retorna o usuário', async () => {
+            const validEmail = 'test@exemplo.com';
+            const user = {
+                id: '1',
+                name: 'Usuário',
+                email: validEmail,
+                photo: 'https://publicdomainvectors.org/photos/abstract-user-flat-4.png',
+                password: 'superforte',
+                role: 'administrador',
+                phoneNumber: '999999999',
+                birth: '01/01/2024'
+            } as User;
+            const findFirstSpy = jest.spyOn(prismaMock.user, 'findFirst').mockResolvedValue(user);
+            const result = await UserService.getUserbyEmail(validEmail);
+            
+            expect(findFirstSpy).toHaveBeenCalledWith({ where: { email: user.email } });
+            expect(findFirstSpy).toHaveBeenCalledTimes(1);
+            expect(result).toEqual(user);
+        });
+
+        test('Email é inválido ==> lança exceção', async () => {
+            const invalidEmail = 'teste@exemplo.com';
+            await expect(UserService.getUserbyEmail(invalidEmail)).
+            rejects.toThrow(new QueryError('Error: this e-mail is not associated with any account.'));
+        });
+
+        test('Não existe usuário com esse email ==> lança exceção', async () => {
+            const invalidEmail = 'test@exemplo.com';
+            await expect(UserService.getUserbyEmail(invalidEmail)).
+            rejects.toThrow(new QueryError('Error: this e-mail is not associated with any account.'));
+        });
+    });
+
+describe('getUserById', () => {
+        
+            beforeEach(() => {
+                jest.resetAllMocks();
+                jest.clearAllMocks();
+            });
+        
+            test('o id é válido ==> retorna o usuário', async () => {
+                const validId = '1';
+                const user = {
+                    id: validId,
+                    name: 'Usuário',
+                    email: 'exemplo@test.com',
+                    photo: 'https://publicdomainvectors.org/photos/abstract-user-flat-4.png',
+                    password: 'superforte',
+                    role: 'administrador',
+                    phoneNumber: '999999999',
+                    birth: '01/01/2024'
+                } as User;
+
+                const findFirstSpy = jest.spyOn(prismaMock.user, 'findFirst').mockResolvedValue(user);
+                const result = await UserService.getUserbyId(validId);
+
+                expect(findFirstSpy).toHaveBeenCalledWith({ where: { id: user.id } });
+                expect(findFirstSpy).toHaveBeenCalledTimes(1);
+                expect(result).toEqual(user);
+            });
+
+            test('Não existe usuário com esse id ==> lança exceção', async () => {
+                const invalidId = '1';
+                await expect(UserService.getUserbyId(invalidId)).
+                rejects.toThrow(new QueryError('Error: this id does not exist.'));
+            });
+        });
+
+describe('getUserByPhoneNumber', () => {
+                
+                    beforeEach(() => {
+                        jest.resetAllMocks();
+                        jest.clearAllMocks();
+                    });
+                
+                    test('o número é válido ==> retorna o usuário', async () => {
+                        const validNumber = '999999999';
+                        const user = {
+                            id: '1',
+                            name: 'Usuário',
+                            email: 'exemplo@test.com',
+                            photo: 'https://publicdomainvectors.org/photos/abstract-user-flat-4.png',
+                            password: 'superforte',
+                            role: 'administrador',
+                            phoneNumber: validNumber,
+                            birth: '01/01/2024'
+                        } as User;
+                        const findFirstSpy = jest.spyOn(prismaMock.user, 'findFirst').mockResolvedValue(user);
+                        const result = await UserService.getUserbyPhoneNumber(validNumber);
+
+                        expect(findFirstSpy).toHaveBeenCalledWith({ where: { phoneNumber: user.phoneNumber } });
+                        expect(findFirstSpy).toHaveBeenCalledTimes(1);
+                        expect(result).toEqual(user);
+                    }
+                );
+                
+                
+                test('Número é inválido ==> lança exceção', async () => {
+                    const invalidNumber = '999999999';
+                    await expect(UserService.getUserbyPhoneNumber(invalidNumber)).
+                    rejects.toThrow(new QueryError('Error: this phone number is not associated with any account.'));
+                });
+
+                test('Não existe usuário com esse número ==> lança exceção', async () => {
+                    const invalidNumber = '999999999';
+                    await expect(UserService.getUserbyPhoneNumber(invalidNumber)).
+                    rejects.toThrow(new QueryError('Error: this phone number is not associated with any account.'));
+                });
+        });
+
+
+
 
 describe('deleteByEmail', () => {
 
