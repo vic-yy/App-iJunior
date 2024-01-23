@@ -90,10 +90,10 @@ describe('getUsers', () => {
         await expect(UserService.getUsers()).resolves.toEqual([firstUser, secondUser]);
     });
 
-    test('nenhum usuário cadastrado ==> retorna array vazio', async () => {
+    test('nenhum usuário cadastrado ==> gera erro', async () => {
         prismaMock.user.findMany.mockResolvedValue([]);
 
-        await expect(UserService.getUsers()).resolves.toEqual([]);
+        await expect(UserService.getUsers()).rejects.toThrow(new QueryError('Error: no users found.'));
     });
 });
 

@@ -70,7 +70,7 @@ class UserService {
 
 	async getUsers() {
 		const users = await prisma.user.findMany();
-		if (users) {
+		if (users.length != 0) {
 			return users;
 		} else {
 			throw new QueryError('Error: no users found.');
