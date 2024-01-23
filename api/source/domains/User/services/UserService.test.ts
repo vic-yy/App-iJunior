@@ -29,6 +29,17 @@ describe('createUser', () => {
         birth: "01/01/2024"
     }
 
+    const incompletUser = {
+        id: "1",
+        name: "",
+        email: "teste@gmail.com",
+        photo: "https://publicdomainvectors.org/photos/abstract-user-flat-4.png",
+        password: "superforte",
+        role: "administrador",
+        phoneNumber: "37999999999",
+        birth: "01/01/2024"
+    }
+
     test('o método recebe dados do usuário ==> cadastra no banco de dados', async () => {
         prismaMock.user.create.mockResolvedValue(newUser);
 
@@ -39,6 +50,10 @@ describe('createUser', () => {
         prismaMock.user.findFirst.mockResolvedValue(newUser);
 
         await expect(UserService.createUser(newUser)).rejects.toThrow(new QueryError('Error: e-mail already in use by another account.'));
+    });
+
+    test('nome do usuário não definido ==> gerar erro', async () => {
+        await expect(UserService.createUser(incompletUser)).rejects.toThrow(new QueryError('Error: you did not define a name.'));
     });
 });
 
