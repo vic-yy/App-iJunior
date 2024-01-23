@@ -57,6 +57,46 @@ describe('createUser', () => {
     });
 });
 
+describe('getUsers', () => {
+    beforeEach(() => {
+        jest.resetAllMocks();
+    })
+
+    const firstUser = {
+        id: "1",
+        name: "Usuário 1",
+        email: "1@gmail.com",
+        photo: "https://publicdomainvectors.org/photos/abstract-user-flat-4.png",
+        password: "superforte",
+        role: "administrador",
+        phoneNumber: "37111111111",
+        birth: "01/01/2024"
+    }
+
+    const secondUser = {
+        id: "2",
+        name: "Usuário 2",
+        email: "2@gmail.com",
+        photo: "https://publicdomainvectors.org/photos/abstract-user-flat-4.png",
+        password: "superforte",
+        role: "administrador",
+        phoneNumber: "37222222222",
+        birth: "01/01/2024"
+    }
+
+    test('dois usuários estão cadastrados ==> retorna os dois usuários', async () => {
+        prismaMock.user.findMany.mockResolvedValue([firstUser, secondUser]);
+
+        await expect(UserService.getUsers()).resolves.toEqual([firstUser, secondUser]);
+    });
+
+    test('nenhum usuário cadastrado ==> retorna array vazio', async () => {
+        prismaMock.user.findMany.mockResolvedValue([]);
+
+        await expect(UserService.getUsers()).resolves.toEqual([]);
+    });
+});
+
 describe('deleteById', () => {
 
     beforeEach(() => {
