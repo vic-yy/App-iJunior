@@ -1,4 +1,4 @@
-import { prisma } from "../../../../database/prismaClient";
+import prisma from "../../../../database/prismaClient";
 import { User } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
