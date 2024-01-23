@@ -14,7 +14,7 @@ describe('createUser', () => {
         photo: "https://publicdomainvectors.org/photos/abstract-user-flat-4.png",
         password: "superforte",
         role: "administrador",
-        phoneNumber: "999999999",
+        phoneNumber: "37999999999",
         birth: "01/01/2024"
     }
 
@@ -25,7 +25,7 @@ describe('createUser', () => {
         photo: "https://publicdomainvectors.org/photos/abstract-user-flat-4.png",
         password: expect.anything(),
         role: "administrador",
-        phoneNumber: "999999999",
+        phoneNumber: "37999999999",
         birth: "01/01/2024"
     }
 
