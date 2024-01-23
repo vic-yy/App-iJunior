@@ -9,6 +9,7 @@ import { QueryError } from "../../../../errors/QueryError";
 import { transformRole } from "../../../../utils/Role";
 import isEmailValid from "../../../../utils/isEmailValid";
 import isURLValid from "../../../../utils/isURLValid";
+import isPhoneNumberValid from "../../../../utils/isPhoneNumberValid";
 
 class UserService {
 
@@ -35,18 +36,21 @@ class UserService {
 		if (body.password == null || body.password.trim() == '') {
 			throw new QueryError('Error: you did not define a password.');
 		}
-		if (body.birth == null) {
+		if (body.birth == null || body.birth.trim() == '') {
 			throw new QueryError('Error: you did not define a birth date.');
 		}
 
 		if (!isEmailValid(body.email)) {
 			throw new InvalidParamError('Error: invalid e-mail.');
 		}
-		if (body.photo != null && !isURLValid(body.photo)) {
+		if (!isURLValid(body.photo)) {
 			throw new InvalidParamError('Error: invalid photo.');
 		}
 		if (transformRole(body.role) == 'none') {
 			throw new InvalidParamError('Error: invalid role. It must be "administrator", "member" or "trainee".');
+		}
+		if (!isPhoneNumberValid(body.phoneNumber)) {
+			throw new InvalidParamError('Error: invalid phone number.');
 		}
 
 		const encrypted = await this.encryptPassword(body.password);
