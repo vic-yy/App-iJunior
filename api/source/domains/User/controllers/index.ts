@@ -57,10 +57,6 @@ router.get('/get/phone/:phone', checkRole([Role.ADM, Role.MEMBRO]), async (req: 
 router.put('/update/:id', checkRole([Role.ADM, Role.MEMBRO, Role.TRAINEE]), async (req: Request, res: Response, next: NextFunction) => {
     try {
         const id = req.params.id;
-        if (id === undefined) {
-            res.status(statusCodes.BAD_REQUEST).json({ error: 'User not found' });
-            return;
-        }
 
         await UserService.updateUser(id, req.body);
 
@@ -73,14 +69,22 @@ router.put('/update/:id', checkRole([Role.ADM, Role.MEMBRO, Role.TRAINEE]), asyn
 router.put('/update/role/:id', checkRole([Role.ADM]), async (req: Request, res: Response, next: NextFunction) => {
     try {
         const id = req.params.id;
-        if (id === undefined) {
-            res.status(statusCodes.BAD_REQUEST).json({ error: 'User not found' });
-            return;
-        }
 
         await UserService.updateRole(id, req.body.role);
 
         res.status(statusCodes.SUCCESS).json("Cargo do usuário editado com sucesso!");
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.put('/update/password/:id', checkRole([Role.ADM, Role.MEMBRO, Role.TRAINEE]), async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const id = req.params.id;
+
+        await UserService.updatePassword(id, req.body.password);
+
+        res.status(statusCodes.SUCCESS).json("Senha do usuário editada com sucesso!");
     } catch (error) {
         next(error);
     }

@@ -126,16 +126,17 @@ class UserService {
 		if (body.role && (transformRole(body.role) != user.role)) {
 			throw new InvalidParamError('Error: only administrators can update a role.');
 		}
+
 		if (body.id && (body.id != user.id)) {
 			throw new InvalidParamError('Error: you can not update an id.');
 		}
 
+		if (body.name == null || body.name.trim() == '') {
+			throw new QueryError('O nome não foi definido.');
+		}
 
-		let encrypted;
-		if (body.password) {
-			encrypted = await this.encryptPassword(body.password);
-		} else {
-			encrypted = user.password;
+		if (body.birth == null || body.birth.trim() == '') {
+			throw new QueryError('A data de nascimento não foi definida.');
 		}
 
 		await prisma.user.update({
@@ -143,8 +144,6 @@ class UserService {
 				name: body.name,
 				email: body.email,
 				photo: body.photo,
-				password: encrypted,
-				role: transformRole(body.role),
 				phoneNumber: body.phoneNumber,
 				birth: body.birth
 			},
@@ -175,6 +174,24 @@ class UserService {
 				},
 			});
 		}
+	}
+
+	async updatePassword(id: string, password: string){
+		const user = await this.getUserbyId(id);
+
+		if (!user) {
+			throw new InvalidParamError(`Usuário não encontrado.`);
+		}
+
+		const encrypted = await this.encryptPassword(password);
+		await prisma.user.update({
+			where: {
+				id: id,
+			},
+			data: {
+				password: encrypted,
+			},
+		});
 	}
 
 	async deleteUserbyEmail(wantedEmail: string) {
