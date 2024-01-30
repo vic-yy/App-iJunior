@@ -183,6 +183,10 @@ class UserService {
 			throw new InvalidParamError(`Usuário não encontrado.`);
 		}
 
+		if (password == null || password.trim() == '') {
+			throw new QueryError('A senha não foi definida.');
+		}
+
 		const encrypted = await this.encryptPassword(password);
 		await prisma.user.update({
 			where: {
