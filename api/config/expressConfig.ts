@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import express, { Express } from "express";
 import cors, { CorsOptions } from "cors";
 import UserRouter from "../source/domains/User/controllers/index";
+import cookieParser = require("cookie-parser");
 
 dotenv.config();
 
@@ -13,6 +14,9 @@ const options : CorsOptions = {
 }
 
 app.use(cors(options));
+app.use(cookieParser());
+
+
 app.use(express.json());
 app.use(express.urlencoded({
     extended: true
