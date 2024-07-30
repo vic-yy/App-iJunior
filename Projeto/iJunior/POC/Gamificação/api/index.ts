@@ -46,9 +46,13 @@ app.get('/api/getCollectedBadges', async (req: Request, res: Response) => {
   }
 });
 
+
 app.post('/api/collect', async (req: Request, res: Response) => {
   try {
-    const serverDate = new Date();
+    const testDate = new Date('2024-08-03T10:00:00Z'); // Exemplo: 30 de julho de 2024 às 10:00 UTC
+
+    // Use a data de teste em vez da data atual
+    const serverDate = testDate;
     const dayNumber = serverDate.getDay() === 0 ? 7 : serverDate.getDay();
 
     const lastCollected = await prisma.users.findUnique({
@@ -70,6 +74,7 @@ app.post('/api/collect', async (req: Request, res: Response) => {
         data: {
           userId: USER_ID,
           badgeId: dayNumber,
+          collectedAt: serverDate, // Adicione a data de coleta
         },
       });
 
@@ -94,6 +99,7 @@ app.post('/api/collect', async (req: Request, res: Response) => {
         data: {
           userId: USER_ID,
           badgeId: dayNumber,
+          collectedAt: serverDate, 
         },
       });
 

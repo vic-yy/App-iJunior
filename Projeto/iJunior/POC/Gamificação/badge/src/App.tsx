@@ -16,7 +16,7 @@ import { CollectedBadgesResponse, CollectResponse } from './types/apiTypes';
 const days = ['m', 't', 'w', 'th', 'f', 's', 'su'];
 
 const App = () => {
-  const [collectedData, setCollectedData] = useState<CollectedBadgesResponse['collected'] | null>(null);
+  const [collectedData, setCollectedData] = useState<CollectedBadgesResponse['coletado'] | null>(null);
   const [update, setUpdate] = useState(0);
   const toast = useToast();
 
@@ -28,7 +28,7 @@ const App = () => {
       .catch(() => {
         toast({
           title: 'Error',
-          description: 'There was an error getting the badges',
+          description: 'Houve um erro para pegar o prêmio',
           status: 'error',
           duration: 5000,
           isClosable: true
@@ -45,7 +45,7 @@ const App = () => {
         if (response.data.collected) {
           toast({
             title: 'Success',
-            description: 'You have collected a badge',
+            description: 'Parabéns! Você coletou o prêmio do dia',	
             status: 'success',
             duration: 5000,
             isClosable: true
@@ -54,7 +54,7 @@ const App = () => {
         } else {
           toast({
             title: 'Error',
-            description: "You have already collected today's badge",
+            description: "Você já coletou o prêmio do dia",
             status: 'error',
             duration: 5000,
             isClosable: true
@@ -66,13 +66,13 @@ const App = () => {
   return (
     <Container maxW="6xl" p={4}>
       <Grid templateColumns="repeat(3, 1fr)" gap={4} mb={4}>
-        <Heading>Welcome user!</Heading>
+        <Heading>Bem Vindo(a)!</Heading>
         <Flex justifyContent="flex-end">
           {/* Add your color mode toggle here */}
         </Flex>
       </Grid>
       <Heading my={8} size="md">
-        Here are the available badges
+        Colete seu prêmio diário
       </Heading>
       <Grid templateColumns="repeat(7, 1fr)" gap={4}>
         {days.map((day, i) => (
@@ -89,10 +89,10 @@ const App = () => {
           >
             <img src={`/badges/${i}.png`} alt="badge" width={200} height={200} />
             <Text align="center" my={4}>
-              {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][i]}
+              {['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'][i]}
             </Text>
             <Text align="center" color={textColor}>
-              {collectedData ? collectedData[day] : 0} collected
+              {collectedData ? collectedData[day] : 0} coletado(s)
             </Text>
           </Box>
         ))}
