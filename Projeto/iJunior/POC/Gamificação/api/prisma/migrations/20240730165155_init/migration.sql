@@ -1,0 +1,14 @@
+-- CreateTable
+CREATE TABLE "CollectedBadges" (
+    "badgeId" INTEGER NOT NULL,
+    "userId" INTEGER NOT NULL,
+    "collectedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT
+);
+
+-- CreateTable
+CREATE TABLE "Users" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "name" TEXT NOT NULL,
+    "lastBadgeId" INTEGER
+);
